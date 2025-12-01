@@ -1,0 +1,4 @@
+.envnode_modules/
+.env
+dist/
+build/
