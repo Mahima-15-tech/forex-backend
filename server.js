@@ -1,3 +1,4 @@
+// server.js
 const express = require("express");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
@@ -5,9 +6,13 @@ require("dotenv").config();
 
 const app = express();
 
-// ✅ CORS: frontend origin ko allow karo
+// ✅ CORS: local + live dono allow
 const corsOptions = {
-  origin: "http://localhost:5176", // Vite ka URL
+  origin: [
+    "http://localhost:5176",           // Vite local
+    "https://forexalgoplus.com",       // live site
+    "https://www.forexalgoplus.com"    // with www
+  ],
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"],
 };
@@ -22,19 +27,25 @@ app.use(express.json());
 const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
   port: Number(process.env.MAIL_PORT) || 465,
-  secure: process.env.MAIL_SECURE === "true",
+  secure: process.env.MAIL_SECURE === "true", // "true" string in env
   auth: {
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
   },
 });
 
+// SMTP check
 transporter.verify((error, success) => {
   if (error) {
     console.error("SMTP error:", error);
   } else {
     console.log("SMTP ready to send mails");
   }
+});
+
+// Simple root route (useful for Render health check)
+app.get("/", (req, res) => {
+  res.send("ForexAlgoPlus backend running ✅");
 });
 
 // 🔹 Test route
